@@ -22,10 +22,8 @@ spec:
         required: true
       - name: additional_labels
         description: Additional labels to add to Kubernetes resources.
-        varType: list(string)
-        defaultValue:
-          - created-by=gke-ai-quick-start-solutions
-          - ai.gke.io=rag
+        varType: string
+        defaultValue: "created-by=gke-ai-quick-start-solutions,ai.gke.io=rag"
       - name: autopilot_cluster
         varType: string
         defaultValue: false
@@ -46,7 +44,7 @@ spec:
         defaultValue: ""
       - name: cluster_name
         varType: string
-        required: true
+        defaultValue: "ai-on-gke"
       - name: create_brand
         description: Create Brand OAuth Screen
         varType: bool
@@ -264,6 +262,12 @@ spec:
         description: JupyterHub user is only required for standard authentication. Ignore, in case of IAP authentication
       - name: kubernetes_namespace
         description: Kubernetes namespace
+      - name: gke_cluster_name
+        description: GKE cluster name where the chat interface, JupyterHub and Ray cluster are running
+      - name: gke_cluster_location
+        description: GKE cluster location
+      - name: project_id
+        description: GCP project
       - name: ray_dashboard_ip_address
         description: Ray Dashboard global IP address
       - name: ray_dashboard_uri

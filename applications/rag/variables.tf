@@ -43,16 +43,16 @@ variable "kubernetes_namespace" {
 }
 
 variable "additional_labels" {
-  // list(string) is used instead of map(string) since blueprint metadata does not support maps.
-  type        = list(string)
+  // string is used instead of map(string) since blueprint metadata does not support maps.
+  type        = string
   description = "Additional labels to add to Kubernetes resources."
-  default     = ["created-by=ai-on-gke", "ai.gke.io=rag"]
+  default     = "created-by=ai-on-gke,ai.gke.io=rag"
 }
 
 variable "jupyter_service_account" {
   type        = string
   description = "Google Cloud IAM service account for authenticating with GCP services"
-  default     = "jupyter-sa"
+  default     = "jupyter-rag-sa"
 }
 
 variable "enable_grafana_on_ray_dashboard" {
@@ -70,7 +70,7 @@ variable "create_ray_service_account" {
 variable "ray_service_account" {
   type        = string
   description = "Google Cloud IAM service account for authenticating with GCP services"
-  default     = "ray-sa"
+  default     = "ray-rag-sa"
 }
 
 variable "create_rag_service_account" {
