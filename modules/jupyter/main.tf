@@ -107,7 +107,7 @@ resource "helm_release" "jupyterhub" {
   namespace        = var.namespace
   create_namespace = true
   cleanup_on_fail  = "true"
-  timeout          = 600
+  timeout          = 1200
 
   values = var.autopilot_cluster ? [templatefile("${path.module}/jupyter_config/config-selfauth-autopilot.yaml", {
     password                          = var.add_auth ? "dummy" : random_password.generated_password[0].result
