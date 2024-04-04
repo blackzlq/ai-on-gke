@@ -112,7 +112,7 @@ resource "helm_release" "jupyterhub" {
   values = var.autopilot_cluster ? [templatefile("${path.module}/jupyter_config/config-selfauth-autopilot.yaml", {
     password                          = var.add_auth ? "dummy" : random_password.generated_password[0].result
     project_id                        = var.project_id
-    project_number                    = data.google_project.project.number
+    project_number                    = "${data.google_project.project.number}"
     namespace                         = var.namespace
     additional_labels                 = local.additional_labels
     backend_config                    = var.k8s_backend_config_name
@@ -131,7 +131,7 @@ resource "helm_release" "jupyterhub" {
     ] : [templatefile("${path.module}/jupyter_config/config-selfauth.yaml", {
       password                          = var.add_auth ? "dummy" : random_password.generated_password[0].result
       project_id                        = var.project_id
-      project_number                    = data.google_project.project.number
+      project_number                    = "${data.google_project.project.number}"
       namespace                         = var.namespace
       additional_labels                 = local.additional_labels
       backend_config                    = var.k8s_backend_config_name
