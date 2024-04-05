@@ -15,25 +15,33 @@ def make_iap_request(url, client_id, method="GET", **kwargs):
 
   open_id_connect_token = id_token.fetch_id_token(Request(), client_id)
   print(open_id_connect_token)
-  resp = requests.request(
-      method,
-      url,
-      headers={"Authorization": "Bearer {}".format(open_id_connect_token)},
-      **kwargs
-  )
-  if resp.status_code == 403:
-    raise Exception(
-        "Service account does not have permission to "
-        "access the IAP-protected application."
+  try:
+    resp = requests.request(
+        method,
+        url,
+        headers={"Authorization": "Bearer {}".format(open_id_connect_token)},
+        **kwargs
     )
-  elif resp.status_code != 200:
-    raise Exception(
-        "Bad response from application: {!r} / {!r} / {!r}".format(
-            resp.status_code, resp.headers, resp.text
-        )
-    )
-  else:
-    return resp.text
+    # If the request was successful, you can now process the response
+    print(resp.text)
+    if resp.status_code == 403:
+      raise Exception(
+          "Service account does not have permission to "
+          "access the IAP-protected application."
+      )
+    elif resp.status_code != 200:
+      raise Exception(
+          "Bad response from application: {!r} / {!r} / {!r}".format(
+              resp.status_code, resp.headers, resp.text
+          )
+      )
+    else:
+      return resp.text
+  except requests.exceptions.RequestException as e:
+    # This will catch any errors during the request
+    print(e)
+
+
 
 def test_jupyter():
   r = make_iap_request(jupyter_url, jupyter_client_id)
