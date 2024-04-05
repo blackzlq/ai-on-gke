@@ -36,7 +36,7 @@ hub:
       project_id: '${project_id}'
       namespace: '${namespace}'
       service_name: '${service_name}'
-      project_number: "${project_number}"
+      project_number: '553239239816'
     Authenticator:
       admin_users:
         - admin
