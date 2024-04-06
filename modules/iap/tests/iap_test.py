@@ -4,11 +4,12 @@ from google.auth.transport.requests import Request
 from google.oauth2 import id_token
 from googleapiclient import discovery
 import google.auth
-from google.cloud import resource_manager
+from google.cloud import resourcemanager_v3
+
 
 def get_project_number(project_id):
   # Create a Resource Manager client
-  client = resource_manager.Client()
+  client = resourcemanager_v3.Client()
 
   # Fetch the project
   project = client.fetch_project(project_id)
