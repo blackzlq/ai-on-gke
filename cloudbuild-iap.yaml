@@ -106,6 +106,8 @@ steps:
         # Validate JupyterHub: Test Hub
         cd /workspace/modules/iap/tests
         pip3 install --upgrade google-api-python-client
+        pip3 install google-cloud-resource-manager
+          
         python3 iap_test.py $(terraform output frontend_uri) $(kubectl get secret frontend-iap-secret -n rag-$SHORT_SHA-$_BUILD_ID -o jsonpath="{.data.client_id}" | base64 --decode; echo) $(terraform output jupyterhub_uri) $(kubectl get secret jupyter-iap-secret -n rag-$SHORT_SHA-$_BUILD_ID -o jsonpath="{.data.client_id}" | base64 --decode; echo) $(terraform output ray_dashboard_uri) $(kubectl get secret ray-dashboard-secret -n rag-$SHORT_SHA-$_BUILD_ID -o jsonpath="{.data.client_id}" | base64 --decode; echo) $PROJECT_ID rag-$SHORT_SHA-$_BUILD_ID
         echo "pass" > /workspace/rag_jupyterhub_test_result.txt
     allowFailure: true

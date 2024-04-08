@@ -9,13 +9,19 @@ from google.cloud import resourcemanager_v3
 
 def get_project_number(project_id):
   # Create a Resource Manager client
-  client = resourcemanager_v3.Client()
+  client = resourcemanager_v3.ProjectsClient()
 
-  # Fetch the project
-  project = client.fetch_project(project_id)
+  # Initialize request argument(s)
+  request = resourcemanager_v3.GetProjectRequest(
+      name=f'projects/{project_id}',
+  )
 
-  # Return the project number
-  return project.number
+  # Make the request
+  response = client.get_project(request=request)
+
+  # Handle the response
+  print(response)
+  return response.name.split('/')[1]
 
 
 
