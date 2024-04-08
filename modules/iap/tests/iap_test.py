@@ -37,6 +37,7 @@ namespace = sys.argv[8]
 def list_backend_services_ids(project_id, keyword):
   credentials, _ = google.auth.default()
   service = discovery.build('compute', 'v1', credentials=credentials)
+  print(f'project id is {project_id}')
   request = service.backendServices().list(project=project_id)
   response = request.execute()
 
