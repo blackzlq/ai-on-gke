@@ -34,6 +34,8 @@ ray_dashboard_client_id = sys.argv[6]
 project_id = get_project_id()
 namespace = sys.argv[8]
 
+print(f'get sys argv 7 project id {sys.argv[7]}')
+
 def list_backend_services_ids(project_id, keyword):
   credentials, _ = google.auth.default()
   service = discovery.build('compute', 'v1', credentials=credentials)
@@ -54,9 +56,9 @@ def get_project_id():
 
   # else if this is running locally then GOOGLE_APPLICATION_CREDENTIALS should be defined
   elif 'GOOGLE_APPLICATION_CREDENTIALS' in os.environ:
-  with open(os.environ['GOOGLE_APPLICATION_CREDENTIALS'], 'r') as fp:
-    credentials = json.load(fp)
-  project_id = credentials['project_id']
+    with open(os.environ['GOOGLE_APPLICATION_CREDENTIALS'], 'r') as fp:
+      credentials = json.load(fp)
+    project_id = credentials['project_id']
 
   return project_id
 
