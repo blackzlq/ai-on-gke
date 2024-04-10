@@ -24,6 +24,16 @@ def get_project_number(project_id):
   return response.name.split('/')[1]
 
 
+def get_project_id():
+  if 'GCP_PROJECT' in os.environ:
+    id = os.environ['GCP_PROJECT']
+
+  # else if this is running locally then GOOGLE_APPLICATION_CREDENTIALS should be defined
+  elif 'GOOGLE_APPLICATION_CREDENTIALS' in os.environ:
+    with open(os.environ['GOOGLE_APPLICATION_CREDENTIALS'], 'r') as fp:
+      credentials = json.load(fp)
+    id = credentials['project_id']
+  return id
 
 frontend_url = sys.argv[1]
 frontend_client_id = sys.argv[2]
@@ -50,17 +60,6 @@ def list_backend_services_ids(project_id, keyword):
 
   return filtered_service_ids
 
-def get_project_id():
-  if 'GCP_PROJECT' in os.environ:
-    project_id = os.environ['GCP_PROJECT']
-
-  # else if this is running locally then GOOGLE_APPLICATION_CREDENTIALS should be defined
-  elif 'GOOGLE_APPLICATION_CREDENTIALS' in os.environ:
-    with open(os.environ['GOOGLE_APPLICATION_CREDENTIALS'], 'r') as fp:
-      credentials = json.load(fp)
-    project_id = credentials['project_id']
-
-  return project_id
 
 def make_iap_request(url, client_id, keyword, method="GET", **kwargs):
   if "timeout" not in kwargs:
