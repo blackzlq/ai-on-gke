@@ -26,6 +26,7 @@ def get_project_number(project_id):
 
 
 def get_project_id():
+  id = ""
   if 'GCP_PROJECT' in os.environ:
     id = os.environ['GCP_PROJECT']
 
