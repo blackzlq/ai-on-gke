@@ -108,7 +108,7 @@ steps:
         pip3 install --upgrade google-api-python-client
         pip3 install google-cloud-resource-manager
         echo $PROJECT_ID
-        python3 iap_test.py $(terraform output frontend_uri) $(kubectl get secret frontend-iap-secret -n rag-$SHORT_SHA-$_BUILD_ID -o jsonpath="{.data.client_id}" | base64 --decode; echo) $(terraform output jupyterhub_uri) $(kubectl get secret jupyter-iap-secret -n rag-$SHORT_SHA-$_BUILD_ID -o jsonpath="{.data.client_id}" | base64 --decode; echo) $(terraform output ray_dashboard_uri) $(kubectl get secret ray-dashboard-secret -n rag-$SHORT_SHA-$_BUILD_ID -o jsonpath="{.data.client_id}" | base64 --decode; echo) $PROJECT_ID rag-$SHORT_SHA-$_BUILD_ID
+        python3 iap_test.py --frontend_url=$(terraform output frontend_uri) --frontend_client_id=$(kubectl get secret frontend-iap-secret -n rag-$SHORT_SHA-$_BUILD_ID -o jsonpath="{.data.client_id}" | base64 --decode; echo) --jupyter_url=$(terraform output jupyterhub_uri) --jupyter_client_id=$(kubectl get secret jupyter-iap-secret -n rag-$SHORT_SHA-$_BUILD_ID -o jsonpath="{.data.client_id}" | base64 --decode; echo) --ray_dashboard_url=$(terraform output ray_dashboard_uri) --ray_dashboard_client_id=$(kubectl get secret ray-dashboard-secret -n rag-$SHORT_SHA-$_BUILD_ID -o jsonpath="{.data.client_id}" | base64 --decode; echo) --project_id=$PROJECT_ID --namespace=rag-$SHORT_SHA-$_BUILD_ID
         echo "pass" > /workspace/rag_jupyterhub_test_result.txt
     allowFailure: true
     waitFor: []

@@ -81,15 +81,15 @@ def make_iap_request(url, client_id, keyword, method="GET", **kwargs):
     print(e)
 
 # Define the argument parser and add arguments
-parser = argparse.ArgumentParser(description="Script to test GCP backend services via IAP.")
-parser.add_argument('frontend_url', help="URL of the frontend service")
-parser.add_argument('frontend_client_id', help="Client ID for the frontend service")
-parser.add_argument('jupyter_url', help="URL of the Jupyter service")
-parser.add_argument('jupyter_client_id', help="Client ID for the Jupyter service")
-parser.add_argument('ray_dashboard_url', help="URL of the Ray dashboard")
-parser.add_argument('ray_dashboard_client_id', help="Client ID for the Ray dashboard")
-parser.add_argument('project_id', help="GCP Project ID")
-parser.add_argument('namespace', help="Namespace for the backend services")
+parser = argparse.ArgumentParser(description="Script to test GCP backend services via IAP.", required=True)
+parser.add_argument('--frontend_url', help="URL of the frontend service", required=True)
+parser.add_argument('--frontend_client_id', help="Client ID for the frontend service", required=True)
+parser.add_argument('--jupyter_url', help="URL of the Jupyter service", required=True)
+parser.add_argument('--jupyter_client_id', help="Client ID for the Jupyter service", required=True)
+parser.add_argument('--ray_dashboard_url', help="URL of the Ray dashboard", required=True)
+parser.add_argument('--ray_dashboard_client_id', help="Client ID for the Ray dashboard", required=True)
+parser.add_argument('--project_id', help="GCP Project ID", required=True)
+parser.add_argument('--namespace', help="Namespace for the backend services", required=True)
 
 # Parse the arguments
 args = parser.parse_args()
