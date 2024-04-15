@@ -81,7 +81,7 @@ def make_iap_request(url, client_id, keyword, method="GET", **kwargs):
     print(e)
 
 # Define the argument parser and add arguments
-parser = argparse.ArgumentParser(description="Script to test GCP backend services via IAP.", required=True)
+parser = argparse.ArgumentParser(description="Script to test GCP backend services via IAP.")
 parser.add_argument('--frontend_url', help="URL of the frontend service", required=True)
 parser.add_argument('--frontend_client_id', help="Client ID for the frontend service", required=True)
 parser.add_argument('--jupyter_url', help="URL of the Jupyter service", required=True)
