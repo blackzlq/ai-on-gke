@@ -32,5 +32,5 @@ steps:
 # Fail the build if there are any violations
 timeout: '12000s'
 
-# options:
-#  logging: CLOUD_LOGGING_ONLY
+options:
+  logging: CLOUD_LOGGING_ONLY
