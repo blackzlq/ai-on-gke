@@ -1,0 +1,36 @@
+steps:
+- name: 'ubuntu'
+  id: 'Copy Folder Locally'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    apt-get update && apt-get install -y tree tree
+    mkdir -p security_test/scan_target/ && find . -mindepth 1 -maxdepth 1 -type d ! -name "security_test" -exec cp -r {} security_test/scan_target/ \;
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Build Docker Image'
+  args:
+  - 'build'
+  - '--network=cloudbuild'
+  - '-t'
+  - 'gcr.io/$PROJECT_ID/check_violations:latest'
+  - '-f'
+  - 'security_test/Dockerfile'
+  - 'security_test'
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Run Docker Image'
+  args:
+  - 'run'
+  - '--network=cloudbuild'
+  - '--rm'
+  - '-e'
+  - 'MODE=Static'
+  - 'gcr.io/$PROJECT_ID/check_violations:latest'
+
+# Fail the build if there are any violations
+timeout: '12000s'
+
+# options:
+#  logging: CLOUD_LOGGING_ONLY
