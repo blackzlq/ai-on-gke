@@ -1,5 +1,5 @@
 # Stage 1: Use the Terraform image to copy Terraform binary
-FROM gcr.io/zlq-gke-dev/terraform:latest as terraform
+FROM gcr.io/dlp-demo-2-193019/terraform:latest as terraform
 
 # Stage 2: Use a Go image to build your Go application
 FROM golang:1.22 as builder
