@@ -20,6 +20,9 @@ RUN apt-get update && apt-get install -y \
     google-cloud-sdk \
     google-cloud-sdk-gke-gcloud-auth-plugin
 
+# Copy Terraform binary from the terraform stage
+COPY --from=terraform /usr/local/bin/terraform /usr/local/bin/terraform
+
 # Set the working directory inside the container
 WORKDIR /workspace
 
