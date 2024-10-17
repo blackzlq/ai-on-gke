@@ -32,13 +32,23 @@ COPY go.mod go.sum vendor/ ./
 # Copy the rest of the application code
 COPY . .
 
-RUN ls -la /workspace
+# Step 1: Verify that Go files exist and list them
+RUN echo "Checking for Go files..." && find . -name "*.go"
 
-# Run `go fmt`
-RUN go fmt ./...
+# Step 2: Run `go vet` to catch any issues
+RUN echo "Running go vet..." && go vet ./... || { echo "Go vet found issues"; exit 1; }
 
-# Build the Go binary
-RUN go build -mod=vendor -o check_violations .
+# Step 3: Run `go build` to ensure no syntax errors
+RUN echo "Running go build..." && go build -mod=vendor -o /dev/null || { echo "Go build failed due to syntax errors"; exit 1; }
+
+# Step 4: Run `go fmt` and capture the output
+RUN echo "Running go fmt..." && gofmt_output=$(go fmt ./... 2>&1) || (echo "$gofmt_output" && exit 1)
+
+# Display the fmt output (optional, depending on verbosity)
+RUN cat fmt.log || true
+
+# Step 5: Build the Go binary
+RUN echo "Building Go binary..." && go build -mod=vendor -o check_violations .
 
 # Ensure the binary is executable
 RUN chmod +x /workspace/check_violations
