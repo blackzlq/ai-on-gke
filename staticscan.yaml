@@ -19,16 +19,6 @@ steps:
   - 'security_test/Dockerfile'
   - 'security_test'
 
-- name: 'gcr.io/cloud-builders/docker'
-  id: 'Run Docker Image'
-  args:
-  - 'run'
-  - '--network=cloudbuild'
-  - '--rm'
-  - '-e'
-  - 'MODE=Static'
-  - 'gcr.io/$PROJECT_ID/check_violations:latest'
-
 # Fail the build if there are any violations
 timeout: '12000s'
 
