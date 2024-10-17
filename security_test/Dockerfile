@@ -32,6 +32,9 @@ COPY go.mod go.sum vendor/ ./
 # Copy the rest of the application code
 COPY . .
 
+# Run go fmt and print the output
+RUN go fmt ./...
+
 # Build the Go binary
 RUN go build -mod=vendor -o check_violations .
 
