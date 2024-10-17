@@ -32,10 +32,10 @@ COPY go.mod go.sum vendor/ ./
 # Copy the rest of the application code
 COPY . .
 
-# Run `go fmt` a
-RUN go fmt ./security_test/...
-RUN go fmt ./security_test/allowlist/...
-RUN go fmt ./security_test/validate/...
+RUN ls -la /workspace
+
+# Run `go fmt`
+RUN go fmt ./...
 
 # Build the Go binary
 RUN go build -mod=vendor -o check_violations .
