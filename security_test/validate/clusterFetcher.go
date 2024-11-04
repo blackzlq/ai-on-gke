@@ -28,12 +28,10 @@ import (
 // 32 MB https://cloud.google.com/api-gateway/docs/quotas#payload_size_limits
 const requestSizeLimit = 32 * 1024 * 1024
 
-type FindFocusComponentFunc func(name string) (string, bool)
-
 type CreateClusterRequestFunc func() *container.CreateClusterRequest
 
 type ClusterFetcher struct {
-	FindFocusComponent FindFocusComponentFunc
+	FocusComponentConfigPath string
 
 	CreateClusterRequest CreateClusterRequestFunc
 	Location             string
@@ -250,7 +248,7 @@ func (c *ClusterFetcher) snapshotYAMLs() (map[string]string, error) {
 			if len(name) == 0 {
 				name = "unknown"
 			}
-			categoryName, shouldScan := c.FindFocusComponent(name)
+			categoryName, shouldScan := FindFocusComponent(name, c.FocusComponentConfigPath)
 			if shouldScan {
 				fmt.Printf("resource item name is %s\n", item.GetName())
 				yamlData, err := runtimeToYAML(&item)

@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/blackzlq/k8s-validation-service-integration-demo/allowlist"
 	"github.com/blackzlq/k8s-validation-service-integration-demo/validate"
 	"google.golang.org/api/container/v1"
 )
@@ -35,17 +34,22 @@ func main() {
 		if clusterName == "" {
 			log.Fatalf("CLUSTER_NAME environment variable not set")
 		}
+
+		focusComponentsPath := os.Getenv("FOCUS_COMPONENT_PATH")
+		if focusComponentsPath == "" {
+			log.Printf("FOCUS_COMPONENT_PATH is not set, will scan all component")
+		}
 		fetcher = &validate.ClusterFetcher{
-			FindFocusComponent:   allowlist.FindFocusComponent,
-			CreateClusterRequest: createClusterRequest,
-			Location:             location,
-			ClusterName:          clusterName,
+			FocusComponentConfigPath: focusComponentsPath,
+			CreateClusterRequest:     createClusterRequest,
+			Location:                 location,
+			ClusterName:              clusterName,
 		}
 	}
 
 	resultHandler := &validate.DefaultResultHandler{
-		ShouldReportViolation: allowlist.ShouldReport,
-		PurifyViolation:       allowlist.PurifyViolation,
+		ShouldReportViolation: validate.ShouldReport,
+		PurifyViolation:       validate.PurifyViolation,
 	}
 	validator, err := validate.NewValidator(ctx, fetcher, resultHandler)
 	if err != nil {

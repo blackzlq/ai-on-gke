@@ -1,84 +1,86 @@
 package validate
 
 import (
-	"embed"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/fs"
-	"regexp"
-	"strings"
+	"os"
+	"path/filepath"
+	"sync"
 
 	v1 "gke-internal.googlesource.com/k8ssecurityvalidation_pa/client.git/v1"
 )
 
-func FindFocusComponent(name string, focusComponentMap map[string]string) (string, bool) {
-	for categoryName, pattern := range focusComponentMap {
-		matched, err := regexp.MatchString(pattern, name)
+// Cache for allowed resources to avoid reloading
+var (
+	allowedResourceKeysMap     map[string][]*v1.Violation
+	allowedResourceKeysMapOnce sync.Once
+)
+
+func loadAllowedResourceKeysMap(allowListFolder string) map[string][]*v1.Violation {
+	// Load the allowed resources once and cache them
+	allowedResourceKeysMapOnce.Do(func() {
+		// Load violations from folder and handle any errors
+		violations, err := allowedViolations(allowListFolder)
 		if err != nil {
-			fmt.Printf("Error compiling regex: %v\n", err)
-			continue
+			fmt.Println("Failed to load allowlist:", err)
+			allowedResourceKeysMap = map[string][]*v1.Violation{} // empty map on failure
+			return
 		}
-		if matched {
-			return categoryName, true
+
+		// Populate the keyMap with the violations
+		allowedResourceKeysMap = map[string][]*v1.Violation{}
+		for _, violation := range violations {
+			key := FetchResourceKey(violation)
+			allowedResourceKeysMap[key] = append(allowedResourceKeysMap[key], violation)
 		}
-	}
-	return "", false
+	})
+
+	// Return the cached map
+	return allowedResourceKeysMap
 }
 
-func AllowedResourceKeysMap(allowList embed.FS) map[string][]*v1.Violation {
-	violations, err := allowedViolations(allowList)
-	keyMap := map[string][]*v1.Violation{}
-	if err != nil {
-		fmt.Println("failed to load allowlist")
-		return keyMap
-	}
-	for _, violation := range violations {
-		key := FetchResourceKey(violation)
-		keyMap[key] = append(keyMap[key], violation)
-	}
-	return keyMap
-}
+// allowedViolations reads all JSON files in the specified folder and parses them into violations
+func allowedViolations(allowListFolder string) ([]*v1.Violation, error) {
+	var violations []*v1.Violation
 
-func allowedViolations(allowList embed.FS) ([]*v1.Violation, error) {
-	var vs []*v1.Violation
-	// Walk through all embedded files in the "folder" directory
-	err := fs.WalkDir(allowList, ".", func(path string, d fs.DirEntry, err error) error {
+	// Walk through the specified folder and process each file
+	err := filepath.Walk(allowListFolder, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		// Check if the file has a .json extension
-		if !d.IsDir() && strings.HasSuffix(d.Name(), ".json") {
-			violations, err := readViolationsFromFile(allowList, path)
+
+		// Only process JSON files
+		if !info.IsDir() && filepath.Ext(path) == ".json" {
+			fileContent, err := os.ReadFile(path)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to read file %s: %w", path, err)
 			}
-			vs = append(vs, violations...)
+
+			// Parse the JSON content
+			var fileViolations []*v1.Violation
+			if err := json.Unmarshal(fileContent, &fileViolations); err != nil {
+				fmt.Printf("Failed to unmarshal JSON file %s: %v\n", path, err)
+				return nil // Skip this file if unmarshalling fails
+			}
+
+			// Append violations from this file to the main list
+			violations = append(violations, fileViolations...)
 		}
+
 		return nil
 	})
-	if err != nil {
-		fmt.Println("Error:", err)
+
+	return violations, err
+}
+
+func ShouldReport(v *v1.Violation) bool {
+	allowListFolder := os.Getenv("ALLOW_LIST_FOLDER")
+	loadAllowedResourceKeysMap(allowListFolder)
+	if allowedResourceKeysMap == nil || len(allowedResourceKeysMap) == 0 {
+		// If the map is empty, report all violations
+		return true
 	}
-	return vs, nil
-}
-
-func readViolationsFromFile(fs embed.FS, name string) ([]*v1.Violation, error) {
-	violations := make([]*v1.Violation, 0)
-	file, _ := fs.Open(name)
-	defer file.Close()
-	data, _ := io.ReadAll(file)
-	if err := json.Unmarshal(data, &violations); err != nil {
-		return nil, err
-	}
-	return violations, nil
-}
-
-func PurifyViolation(v *v1.Violation) *v1.Violation {
-	return v
-}
-
-func ShouldReport(v *v1.Violation, allowedResourceKeysMap map[string][]*v1.Violation) bool {
 	_, exists := allowedResourceKeysMap[FetchResourceKey(v)]
 	return !exists
 }

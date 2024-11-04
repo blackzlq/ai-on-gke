@@ -27,6 +27,10 @@ steps:
   - '--rm'
   - '-e'
   - 'MODE=Helm'
+  - '-e'
+  - 'ALLOW_LIST_FOLDER=/workspace/security_test/allowlist'
+  - '-v'
+  - 'allowlist:/workspace/security_test/allowlist'
   - 'gcr.io/$PROJECT_ID/check_violations:latest'
 
 # Fail the build if there are any violations
