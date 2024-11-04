@@ -20,13 +20,13 @@ steps:
   - 'security_test'
 
 - name: 'ubuntu'
-  id: 'Copy Allowlist'
+  id: 'Copy metadata'
   entrypoint: 'bash'
   args:
   - '-c'
   - |
     mkdir -p /workspace/security_test/allowlist
-    cp -r allowlist/* /workspace/security_test/allowlist/ || echo "Allowlist folder is empty or not found"
+    cp -r security_test_metadata/allowlist/* /workspace/security_test/allowlist/ || echo "Allowlist folder is empty or not found"
 
 - name: 'gcr.io/cloud-builders/docker'
   id: 'Run Docker Image'
