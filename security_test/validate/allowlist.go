@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
 	"sync"
@@ -76,6 +77,30 @@ func allowedViolations(allowListFolder string) ([]*v1.Violation, error) {
 
 func ShouldReport(v *v1.Violation) bool {
 	allowListFolder := os.Getenv("ALLOW_LIST_FOLDER")
+
+	// Print current working directory for debugging
+	wd, err := os.Getwd()
+	if err != nil {
+		log.Printf("Failed to get current working directory: %v", err)
+	} else {
+		log.Printf("Current working directory: %s", wd)
+	}
+
+	// List contents of the allowlist folder
+	if allowListFolder != "" {
+		files, err := os.ReadDir(allowListFolder)
+		if err != nil {
+			log.Printf("Failed to read allowlist folder (%s): %v", allowListFolder, err)
+		} else {
+			log.Printf("Contents of allowlist folder (%s):", allowListFolder)
+			for _, file := range files {
+				log.Printf(" - %s", file.Name())
+			}
+		}
+	} else {
+		log.Println("ALLOW_LIST_FOLDER environment variable is empty.")
+	}
+
 	loadAllowedResourceKeysMap(allowListFolder)
 	if allowedResourceKeysMap == nil || len(allowedResourceKeysMap) == 0 {
 		// If the map is empty, report all violations
