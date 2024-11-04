@@ -1,0 +1,18 @@
+[
+  {
+    "details": {
+      "@type": "type.googleapis.com/google.internal.kubernetes.security.validation.v1.ContainerDetails",
+      "image": "kuberay/operator:v1.0.0",
+      "containerName": "kuberay-operator"
+    },
+    "message": "container \"kuberay-operator\" in Deployment \"kuberay-operator\" has an image \"kuberay/operator:v1.0.0\" with an invalid path. See go/gke-shipshape#imagepath for valid image paths.",
+    "policyName": "imagepath",
+    "resourceKey": {
+      "group": "apps",
+      "kind": "Deployment",
+      "name": "kuberay-operator",
+      "namespace": "rag--1234",
+      "version": "v1"
+    }
+  }
+]

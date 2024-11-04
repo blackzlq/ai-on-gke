@@ -1,0 +1,17 @@
+[
+  {
+    "details": {
+      "@type": "type.googleapis.com/google.internal.kubernetes.security.validation.v1.ContainerDetails",
+      "containerName": "kuberay-operator"
+    },
+    "message": "container \"kuberay-operator\" in Deployment \"kuberay-operator\" is running as root. Update the container to run as non-root. See go/gke-shipshape#rootless for more details",
+    "policyName": "rootless",
+    "resourceKey": {
+      "group": "apps",
+      "kind": "Deployment",
+      "name": "kuberay-operator",
+      "namespace": "rag--1234",
+      "version": "v1"
+    }
+  }
+]

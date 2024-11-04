@@ -1,0 +1,22 @@
+[
+  {
+    "message": "pod in Pod \"ray-cluster-kuberay-head-tqsjg\" must set securityContext.seccompProfile.type to value RuntimeDefault",
+    "policyName": "seccompprofile",
+    "resourceKey": {
+      "kind": "Pod",
+      "name": "ray-cluster-kuberay-head",
+      "namespace": "ml--1234-ray",
+      "version": "v1"
+    }
+  },
+  {
+    "message": "pod in Pod \"ray-cluster-kuberay-head-jbcbc\" must set securityContext.seccompProfile.type to value RuntimeDefault",
+    "policyName": "seccompprofile",
+    "resourceKey": {
+      "kind": "Pod",
+      "name": "ray-cluster-kuberay-head",
+      "namespace": "rag--1234",
+      "version": "v1"
+    }
+  }
+]
