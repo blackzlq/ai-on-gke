@@ -19,6 +19,15 @@ steps:
   - 'security_test/Dockerfile'
   - 'security_test'
 
+- name: 'ubuntu'
+  id: 'Copy Allowlist'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    mkdir -p /workspace/security_test/allowlist
+    cp -r /allowlist/* /workspace/security_test/allowlist/
+
 - name: 'gcr.io/cloud-builders/docker'
   id: 'Run Docker Image'
   args:
@@ -29,8 +38,6 @@ steps:
   - 'MODE=Helm'
   - '-e'
   - 'ALLOW_LIST_FOLDER=/workspace/security_test/allowlist'
-  - '-v'
-  - 'allowlist:/workspace/security_test/allowlist'
   - 'gcr.io/$PROJECT_ID/check_violations:latest'
 
 # Fail the build if there are any violations
