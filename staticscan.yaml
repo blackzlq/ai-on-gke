@@ -26,7 +26,7 @@ steps:
   - '-c'
   - |
     mkdir -p /workspace/security_test/allowlist
-    cp -r /allowlist/* /workspace/security_test/allowlist/
+    cp -r allowlist/* /workspace/security_test/allowlist/
 
 - name: 'gcr.io/cloud-builders/docker'
   id: 'Run Docker Image'
