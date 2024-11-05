@@ -3,6 +3,7 @@ package validate
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -63,7 +64,7 @@ func (v *Validator) scanViolation(ctx context.Context, objects []RequestObject) 
 		operationResourceMap[operation.Name] = object.ResourceName
 	}
 	if len(queue) == 0 {
-		fmt.Printf("no objects to validate")
+		log.Printf("no objects to validate")
 		return nil, nil
 	}
 	var resultObjects []ResultObject
@@ -72,7 +73,7 @@ func (v *Validator) scanViolation(ctx context.Context, objects []RequestObject) 
 		queue = queue[1:]
 		operation, err := v.validationClient.RetrieveOperation(name)
 		if err != nil {
-			fmt.Printf("failed to get operation %v\n, will retry", name)
+			log.Printf("failed to get operation %v\n, will retry", name)
 			queue = append(queue, name)
 		}
 		if operation == nil {
@@ -80,12 +81,12 @@ func (v *Validator) scanViolation(ctx context.Context, objects []RequestObject) 
 		}
 		if operation.Done {
 			if operation.Error != nil {
-				fmt.Printf("error when try to finish the operation, error: %v\n", operation.Error)
+				log.Printf("error when try to finish the operation, error: %v\n", operation.Error)
 			} else {
 				violations, err := v.validationClient.RetrieveViolationsFromOperation(operation)
 				if err != nil {
-					fmt.Printf("failed to parse response to violation, error: %v\n", err)
-					fmt.Printf("yaml file: %s.yaml is not valid\n", operationResourceMap[operation.Name])
+					log.Printf("failed to parse response to violation, error: %v\n", err)
+					log.Printf("yaml file: %s.yaml is not valid\n", operationResourceMap[operation.Name])
 				}
 				if v != nil {
 					for _, violation := range violations {
@@ -95,7 +96,7 @@ func (v *Validator) scanViolation(ctx context.Context, objects []RequestObject) 
 						ResourceName: operationResourceMap[operation.Name],
 						Violations:   violations,
 					})
-					fmt.Printf("yaml file: %s.yaml is valid\n", operationResourceMap[operation.Name])
+					log.Printf("yaml file: %s.yaml is valid\n", operationResourceMap[operation.Name])
 				}
 			}
 		} else {
@@ -104,7 +105,7 @@ func (v *Validator) scanViolation(ctx context.Context, objects []RequestObject) 
 		return len(queue) == 0, nil
 	})
 	if len(queue) > 0 {
-		fmt.Printf("retried 3 times still can not empty the queue")
+		log.Printf("retried 3 times still can not empty the queue")
 	}
 	return resultObjects, err
 }

@@ -69,6 +69,9 @@ func (c *ClusterFetcher) PrepareValidateRequestContent(ctx context.Context) ([]R
 	if err != nil {
 		return nil, fmt.Errorf("failed to snapshot cluster: %v", err)
 	}
+	if len(objects) == 0 {
+		log.Println("validate request content is empty")
+	}
 
 	// Step 4: Delete the cluster
 	if strings.ToLower(createCluster) != "false" {
@@ -88,15 +91,15 @@ func (c *ClusterFetcher) prepareCluster(ctx context.Context, projectID, parent, 
 		return err
 	}
 	// Placeholder for actual cluster creation
-	fmt.Println("Creating cluster...")
+	log.Println("Creating cluster...")
 	cluster, err := c.createGKECluster(svc, projectID, parent, clusterName, location)
 	if err != nil {
 		return err
 	}
-	fmt.Println("Cluster Name:", cluster.Name)
-	fmt.Println("Status:", cluster.Status)
-	fmt.Println("Endpoint:", cluster.Endpoint)
-	fmt.Println("Node Pools:", cluster.NodePools)
+	log.Println("Cluster Name:", cluster.Name)
+	log.Println("Status:", cluster.Status)
+	log.Println("Endpoint:", cluster.Endpoint)
+	log.Println("Node Pools:", cluster.NodePools)
 
 	return waitClusterReachStatus(svc, parent, clusterName, "RUNNING")
 }
@@ -117,7 +120,7 @@ func (c *ClusterFetcher) setupKubeAccess(projectID, location, clusterName string
 }
 
 func (c *ClusterFetcher) prepareValidateRequestContent(ctx context.Context) ([]RequestObject, error) {
-	fmt.Println("Snapshotting cluster...")
+	log.Println("Snapshotting cluster...")
 	yamlMap, err := c.snapshotYAMLs()
 	if err != nil {
 		return nil, err
@@ -126,23 +129,23 @@ func (c *ClusterFetcher) prepareValidateRequestContent(ctx context.Context) ([]R
 }
 
 func (c *ClusterFetcher) cleanup(ctx context.Context, projectID, parent, clusterName, location string) error {
-	fmt.Println("Deleting cluster...")
+	log.Println("Deleting cluster...")
 	return deleteGKECluster(ctx, projectID, parent, clusterName)
 }
 
 // createGKECluster creates a GKE cluster in the specified parent.
 func (c *ClusterFetcher) createGKECluster(svc *container.Service, projectID, parent, clusterName, location string) (*container.Cluster, error) {
 	// Define Your Cluster Configuration
-	fmt.Printf("Creating Request...")
+	log.Printf("Creating Request...\n")
 	// Send the Create Cluster Request
 	op, err := svc.Projects.Locations.Clusters.Create(parent, c.CreateClusterRequest()).Do()
 	if err != nil {
 		log.Fatalf("Error creating cluster: %v", err)
 		return nil, err
 	}
-	fmt.Printf("Create Cluster done")
+	log.Printf("Create Cluster done\n")
 
-	fmt.Printf("Cluster creation in progress: %s\n", op.Name)
+	log.Printf("Cluster creation in progress: %s\n", op.Name)
 	// projects/*/locations/*/clusters/*
 	return svc.Projects.Locations.Clusters.Get(fmt.Sprintf("%s/clusters/%s", parent, clusterName)).Do()
 }
@@ -156,10 +159,10 @@ func waitClusterReachStatus(svc *container.Service, parent, clusterName string, 
 			return fmt.Errorf("failed to get cluster: %w", err)
 		}
 		if cluster.Status == targetStatus {
-			fmt.Printf("Cluster reach target status %s", targetStatus)
+			log.Printf("Cluster reach target status %s\n", targetStatus)
 			return nil
 		}
-		fmt.Printf("Cluster current status: %s, want: %s\n", cluster.Status, targetStatus)
+		log.Printf("Cluster current status: %s, want: %s\n", cluster.Status, targetStatus)
 		return fmt.Errorf("cluster status is %s", cluster.Status)
 	}
 	return backoff.Retry(checkOperationStatus, b)
@@ -193,7 +196,7 @@ func deleteGKECluster(ctx context.Context, projectID, parent, clusterName string
 			if result.Error != nil {
 				return fmt.Errorf("cluster deletion failed: %v", result.Error)
 			}
-			fmt.Printf("Cluster %s successfully deleted from parent %s\n", clusterName, parent)
+			log.Printf("Cluster %s successfully deleted from parent %s\n", clusterName, parent)
 			return nil // Success!
 		}
 		time.Sleep(5 * time.Second) // Poll every 5 seconds
@@ -231,7 +234,7 @@ func (c *ClusterFetcher) snapshotYAMLs() (map[string]string, error) {
 	}
 
 	for _, gvr := range gvrs {
-		fmt.Printf("resource is %v\n", gvr)
+		log.Printf("resource is %v\n", gvr)
 	}
 
 	// Get all resources in all namespaces and print them in YAML format
@@ -250,7 +253,7 @@ func (c *ClusterFetcher) snapshotYAMLs() (map[string]string, error) {
 			}
 			categoryName, shouldScan := FindFocusComponent(name, c.FocusComponentConfigPath)
 			if shouldScan {
-				fmt.Printf("resource item name is %s\n", item.GetName())
+				log.Printf("resource item name is %s\n", item.GetName())
 				yamlData, err := runtimeToYAML(&item)
 				if err != nil {
 					log.Fatalf("Failed to serialize to YAML: %v", err)
@@ -265,7 +268,7 @@ func (c *ClusterFetcher) snapshotYAMLs() (map[string]string, error) {
 			}
 		}
 	}
-	fmt.Println("finished scan resource to gather yaml files")
+	log.Println("finished scan resource to gather yaml files")
 	return yamlMap, nil
 }
 
@@ -273,7 +276,7 @@ func convertYAMLStringToValidateRequestContent(yamlMap map[string]string) ([]Req
 	var objects []RequestObject
 	for name, yaml := range yamlMap {
 		if base64.StdEncoding.EncodedLen(len(yaml)) >= requestSizeLimit {
-			fmt.Printf("single YAML file size is over 32MB, google api do not support it, it is %v\n", base64.StdEncoding.EncodedLen(len(yaml)))
+			log.Printf("single YAML file size is over 32MB, google api do not support it, it is %v\n", base64.StdEncoding.EncodedLen(len(yaml)))
 		} else {
 			objects = append(objects, RequestObject{
 				ResourceName: name,

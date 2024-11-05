@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -45,7 +46,7 @@ func (s *StaticFetcher) PrepareValidateRequestContent(ctx context.Context) ([]Re
 				},
 			})
 		} else {
-			fmt.Printf("Failed to read YAML file %s: %v\n", yamlPath, err)
+			log.Printf("Failed to read YAML file %s: %v\n", yamlPath, err)
 		}
 	}
 

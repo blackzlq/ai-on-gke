@@ -26,10 +26,10 @@ func (h *HelmFetcher) PrepareValidateRequestContent(ctx context.Context) ([]Requ
 		}
 		// Check if this directory contains a Chart.yaml file
 		if info.IsDir() {
-			fmt.Printf("checking %s\n", path)
+			log.Printf("checking %s\n", path)
 			chartPath := filepath.Join(path, "Chart.yaml")
 			if _, err := os.Stat(chartPath); err == nil {
-				fmt.Printf("Found chart in: %s\n", path)
+				log.Printf("Found chart in: %s\n", path)
 				maps, err := renderYamlOffline(path)
 				if err == nil {
 					for name, value := range maps {
@@ -85,7 +85,7 @@ func renderYamlOffline(chartPath string) (map[string]string, error) {
 	result := map[string]string{}
 	// Print the resulting YAML
 	for name, content := range rendered {
-		// fmt.Printf("YAML for template %s in chart %s:\n%s\n", name, chartPath, content)
+		// log.Printf("YAML for template %s in chart %s:\n%s\n", name, chartPath, content)
 		result[fmt.Sprintf("template %s in chart %s", name, chartPath)] = content
 	}
 	return result, nil

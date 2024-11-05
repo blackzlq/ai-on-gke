@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 
 	v1 "gke-internal.googlesource.com/k8ssecurityvalidation_pa/client.git/v1"
@@ -60,7 +61,7 @@ func (d *DefaultResultHandler) deduplicate(violations []*v1.Violation) []*v1.Vio
 		v := d.PurifyViolation(violation)
 		resourceKey := FetchResourceKey(v)
 		if len(resourceKey) == 0 {
-			fmt.Printf("failed to marshal resource key, key: %v", v.ResourceKey)
+			log.Printf("failed to marshal resource key, key: %v", v.ResourceKey)
 			violationArray = append(violationArray, v)
 		} else {
 			if violationMap[resourceKey] == nil {
@@ -79,14 +80,14 @@ func (d *DefaultResultHandler) deduplicate(violations []*v1.Violation) []*v1.Vio
 
 func (d *DefaultResultHandler) filterViolations(violations []*v1.Violation) ([]*v1.Violation, error) {
 	// Placeholder for actual filtering logic
-	fmt.Println("Filtering violations...")
+	log.Println("Filtering violations...")
 	return violations, nil
 }
 
 func (d *DefaultResultHandler) reportAndRecord(request ReportAndRecordRequest) (ReportAndRecordResult, error) {
 	var reportViolations []*v1.Violation
 	// Placeholder for actual reporting and recording logic
-	fmt.Println("Generating report and record violations...")
+	log.Println("Generating report and record violations...")
 	for _, violation := range request.Violations {
 		if d.ShouldReportViolation(violation) {
 			reportViolations = append(reportViolations, violation)
@@ -117,9 +118,9 @@ func (d *DefaultResultHandler) examResult(results []ReportAndRecordResult) error
 			jsonViolations, err := json.MarshalIndent(violationList, "", strings.Repeat(" ", 4))
 
 			if err != nil {
-				fmt.Printf("Failed to create json\n")
+				log.Printf("Failed to create json\n")
 			} else {
-				fmt.Printf("%s violation: %s \n \n==================\n", fileName, jsonViolations)
+				log.Printf("%s violation: %s \n \n==================\n", fileName, jsonViolations)
 
 			}
 		}
