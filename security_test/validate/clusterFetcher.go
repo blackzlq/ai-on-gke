@@ -265,6 +265,7 @@ func (c *ClusterFetcher) snapshotYAMLs() (map[string]string, error) {
 					yamlMap[categoryName] += "\n---\n"
 				}
 				yamlMap[categoryName] += string(yamlData)
+				log.Printf("resource yaml is %s\n", string(yamlData))
 			}
 		}
 	}
