@@ -180,6 +180,8 @@ steps:
   - 'CREATE_CLUSTER=False'
   - '-e'
   - 'ALLOW_LIST_FOLDER=/workspace/security_test/allowlist'
+  - '-e'
+  - 'FOCUS_COMPONENT_PATH=/workspace/security_test/focusComponents.json'
   - '-v'
   - '/workspace/security_test/allowlist:/workspace/security_test/allowlist'
   - '-v'
