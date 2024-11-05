@@ -17,12 +17,12 @@ func main() {
 
 	switch mode {
 	case "Helm":
-		fetcher = &validate.HelmFetcher{
-			RootDir: "./",
+		scanePath := os.Getenv("SCAN_PATH")
+		if scanePath == "" {
+			log.Fatalf("SCAN_PATH not set")
 		}
-	case "Static":
-		fetcher = &validate.StaticFetcher{
-			RootDir: "./",
+		fetcher = &validate.HelmFetcher{
+			RootDir: scanePath,
 		}
 	default:
 		location := os.Getenv("LOCATION")

@@ -27,6 +27,8 @@ steps:
   - |
     mkdir -p /workspace/security_test/allowlist
     cp -r security_test_metadata/allowlist/* /workspace/security_test/allowlist/ || echo "Allowlist folder is empty or not found"
+    mkdir -p /workspace/security_test/scan_target
+    cp -r ./ /workspace/security_test/scan_target
 
 - name: 'gcr.io/cloud-builders/docker'
   id: 'Run Docker Image'
@@ -38,6 +40,8 @@ steps:
   - 'MODE=Helm'
   - '-e'
   - 'ALLOW_LIST_FOLDER=/workspace/security_test/allowlist'
+  - '-e'
+  - 'SCAN_PATH=/workspace/security_test/scan_target'
   - '-v'
   - '/workspace/security_test/allowlist:/workspace/security_test/allowlist'
   - 'gcr.io/$PROJECT_ID/check_violations:latest'
