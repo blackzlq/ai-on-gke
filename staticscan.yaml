@@ -28,7 +28,8 @@ steps:
     mkdir -p /workspace/security_test/allowlist
     cp -r security_test_metadata/allowlist/* /workspace/security_test/allowlist/ || echo "Allowlist folder is empty or not found"
     mkdir -p /workspace/security_test/scan_target
-    cp -r ./ /workspace/security_test/scan_target
+    # Exclude /workspace/security_test from the copy to avoid recursive issue
+    find . -mindepth 1 -maxdepth 1 ! -path "./security_test" -exec cp -r {} /workspace/security_test/scan_target/ \;
 
 - name: 'gcr.io/cloud-builders/docker'
   id: 'Run Docker Image'
