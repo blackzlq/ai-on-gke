@@ -45,6 +45,8 @@ steps:
   - 'SCAN_PATH=/workspace/security_test/scan_target'
   - '-v'
   - '/workspace/security_test/allowlist:/workspace/security_test/allowlist'
+  - '-v'
+  - '/workspace/security_test/scan_target:/workspace/security_test/scan_target'
   - 'gcr.io/$PROJECT_ID/check_violations:latest'
 
 # Fail the build if there are any violations
